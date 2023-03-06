@@ -95,3 +95,27 @@ header {
 .highlighted.light-piece {
     background-color: rgb(10, 50, 10);
 }
+
+/* .colors {
+
+} */
+
+#play-light-button, #play-dark-button {
+    width: 15vmin;
+    height: 5vmin;
+    border: 1vmin;
+    border-style: solid;
+    border-color:goldenrod;
+    border-radius: 20%;
+    text-align: center;
+}
+
+#play-light-button {
+    background: mediumseagreen;
+    color: white;
+}
+
+#play-dark-button {
+    background: saddlebrown;
+    color: white;
+}

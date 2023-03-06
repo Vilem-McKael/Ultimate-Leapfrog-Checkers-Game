@@ -98,16 +98,27 @@ boardEl.addEventListener('click', function(event) {
     if (highlightedPiece) {
         console.log(event.target.parentNode);
         const targetClass = event.target.classList;
+        console.log(targetClass);
         if (targetClass.contains('potential-moves')) { // target is a potential-moves marker
             gridId = event.target.parentNode.id;
             movePiece(highlightedPiece, gridId);
         } else if (targetClass.contains('light') || targetClass.contains('dark')) { // target is a tile 
             gridId = event.target.id;
+            const targetRow = gridId[1];
+            const targetColumn = gridId[3];
+            pieceLocation = highlightedPiece.parentNode.id;
+            const pieceRow = pieceLocation[1];
+            const pieceColumn = pieceLocation[3];
             movePiece(highlightedPiece, gridId);
+        } else if (!targetClass.contains('highlighted')) {
+            highlightedPiece.classList.remove('highlighted');
         }
-
     }
 
+})
+
+boardEl.addEventListener('click', function(event) {
+    highlightedPiece
 })
 
 // board
@@ -242,7 +253,6 @@ function canCapture() {
 
         const r = piece[0];
         const c = piece[1];
-        console.log(r, c);
         const diagL = gameBoard[r+turnVal][c-1]; // piece's left diagonal
         const diagR = gameBoard[r+turnVal][c+1]; // piece's right diagonal
 
