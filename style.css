@@ -1,0 +1,97 @@
+* {
+    box-sizing: border-box;
+}
+
+body {
+    height: 100vh;
+    /* width: 100vh; */
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    /* justify-content: center; */
+    align-items: center;
+    font-family: fantasy;
+    background-color: rgb(25, 70, 25);
+}
+
+header {
+    font-size: 4vmin;
+    color: darkgreen;
+    background-color: mediumseagreen;
+    margin-top: 2vmin;
+    width: 95vmin;
+    text-align: center;
+    letter-spacing: 1vmin;
+    border: .5vmin;
+    border-style: solid;
+    border-color: goldenrod;
+    border-radius: 100%;
+
+}
+
+#rules {
+    /* margin: 0 auto 0 0; */
+    margin: 0 auto;
+}
+
+#game-board {
+    margin-top: -4vmin;
+    display: grid;
+    grid-template: repeat(8, 8vmin) / repeat(8, 8vmin);
+    border-bottom: 1vmin;
+}
+
+#game-board > div {
+    border: 0.2vmin;
+    border-style: solid;
+    border-color: goldenrod;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+#game-board .light {
+    background-color: lightgray;
+}
+
+#game-board .dark {
+    background-color: green;
+}
+
+.light-piece {
+    width: 6vmin;
+    height: 6vmin;
+    border: .5vmin;
+    border-style: solid;
+    border-color: goldenrod;
+    border-radius: 50%;
+    background-color: mediumseagreen;
+}
+
+.dark-piece {
+    width: 6vmin;
+    height: 6vmin;
+    border: .5vmin;
+    border-style: solid;
+    border-color: goldenrod;
+    border-radius: 50%;
+    background-color: saddlebrown;
+}
+
+.possible-moves {
+    width: 3vmin;
+    height: 3vmin;
+    border: .1vmin;
+    border-style: solid;
+    border-color: black;
+    background-color: grey;
+    border-radius: 50%;
+}
+
+.highlighted.dark-piece {
+    background-color: rgb(75, 50, 0);
+}
+
+.highlighted.light-piece {
+    background-color: rgb(10, 50, 10);
+}
