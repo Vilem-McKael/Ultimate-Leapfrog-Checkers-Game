@@ -15,7 +15,7 @@ body {
 }
 
 header {
-    font-size: 4vmin;
+    font-size: 3vmin;
     color: darkgreen;
     background-color: mediumseagreen;
     margin-top: 2vmin;
@@ -26,7 +26,13 @@ header {
     border-style: solid;
     border-color: goldenrod;
     border-radius: 100%;
+}
 
+p {
+    height: 5vmin;
+    margin-top: 1vmin;
+    font-size: 2vmin;
+    color: ivory;
 }
 
 #rules {
@@ -34,14 +40,21 @@ header {
     margin: 0 auto;
 }
 
-#game-board {
+#controls {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+#board {
     margin-top: -4vmin;
     display: grid;
     grid-template: repeat(8, 8vmin) / repeat(8, 8vmin);
     border-bottom: 1vmin;
 }
 
-#game-board > div {
+#board > div {
     border: 0.2vmin;
     border-style: solid;
     border-color: goldenrod;
@@ -50,11 +63,11 @@ header {
     align-items: center;
 }
 
-#game-board .light {
+#board .light {
     background-color: lightgray;
 }
 
-#game-board .dark {
+#board .dark {
     background-color: green;
 }
 
@@ -78,7 +91,7 @@ header {
     background-color: saddlebrown;
 }
 
-.possible-moves {
+.possible-move {
     width: 3vmin;
     height: 3vmin;
     border: .1vmin;
@@ -100,7 +113,7 @@ header {
 
 } */
 
-#play-light-button, #play-dark-button {
+#play-light-button, #play-dark-button, #reset-button {
     width: 15vmin;
     height: 5vmin;
     border: 1vmin;
@@ -118,4 +131,12 @@ header {
 #play-dark-button {
     background: saddlebrown;
     color: white;
+}
+
+#reset-button {
+    margin-top: 3vmin;
+    margin-bottom: 4vmin;
+    background: black;
+    color: white;
+    display: none;
 }
