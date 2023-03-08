@@ -1,13 +1,15 @@
 /*----- Constants -----*/
 
+// piece colors for class work
 const colors = {
     '1': 'dark-piece',
     '-1': 'light-piece'
 }
 
-const playerNames = {
-    '1': 'player1',
-    '-1': 'player2'
+// player colors for display and event listeners
+const playerColors = {
+    '1': 'Brown',
+    '-1': 'Green'
 }
 
 const board = [
@@ -35,6 +37,8 @@ let clickedPiece;
 
 let pieceSelected; // bool, is there a highlighted piece
 
+let playerNames;
+
 
 /*----- Cached Variables -----*/
 
@@ -42,7 +46,9 @@ const boardEl = document.querySelector('#board'); // board element
 const playDarkBtn = document.querySelector('#play-dark-button'); // play as dark pieces button
 const playLightBtn = document.querySelector('#play-light-button'); // play as light pieces button
 const colorSelectors = document.querySelector('#color-select-buttons');
+const controlsTextEl = document.querySelector('#controls-text')
 const resetBtn = document.querySelector('#reset-button'); // reset the board button, only visible if game is in play
+const gameStatusEl = document.getElementById('game-status');
 const tiles = document.querySelectorAll('#board > div'); // all board "tiles" in a Node List
 
 /*----- Event listeners -----*/
@@ -51,33 +57,19 @@ const tiles = document.querySelectorAll('#board > div'); // all board "tiles" in
 
 // Start game, playing as dark (plays first)
 playDarkBtn.addEventListener('click', function() {
-    // changes button display to "in-game" mode
-    resetBtn.style.display = 'inline';
-    colorSelectors.style.display = 'none';
-
-    // initializes player variables according to color choice
-    turn = 1;
-    player1Val = 1;
-    player2Val = -1;
-    init();
+    init(1);
 })
 
 // Start game, playing as light (plays second)
 playLightBtn.addEventListener('click', function() {
-    // changes button display to "in-game" mode
-    resetBtn.style.display = 'inline';
-    colorSelectors.style.display = 'none';
-
-    // initializes player variables according to color choice
-    turn = 1;
-    player1Val = -1;
-    player2Val = 1;
-    init();
+    init(-1);
 })
 
 // Reset the game, clear the board, allow the player to pick a color again
 resetBtn.addEventListener('click', function() {
     clearBoard();
+    gameStatusEl.innerText = 'Welcome to Ultimate Hopscotch!';
+    gameStatusEl.style.backgroundColor = 'black';
     colorSelectors.style.display = 'block';
     resetBtn.style.display = 'none';
 })
@@ -86,21 +78,17 @@ resetBtn.addEventListener('click', function() {
 
 // Shows a piece's possible moves, and highlights the piece, readying it for movement
 boardEl.addEventListener('click', function(event) {
-    //const highlightedEl = document.getElementsByClassName('highlighted');
-    console.log(turn);
-    console.log('turn =', turn, 'this player =', playerNames[turn.toString()], 'other play =', playerNames[(-turn).toString()]);
-
     if (event.target.classList.contains(`${playerNames[turn.toString()]}-piece`)) { 
         showMoves(event);
     } else if (event.target.classList.contains('possible-move')) {
-        move(event.target.parentNode);
+        movePiece(event.target.parentNode);
     } else if (event.target.classList.contains(`${playerNames[(-turn).toString()]}-piece`)) {
         return;
     } else if (event.target.hasChildNodes()) {
         const childNodes = event.target.childNodes ;
         console.log(childNodes);
         if (childNodes[0].classList.contains('possible-move')) {
-            move(event.target);
+            movePiece(event.target);
         }
     }
 });
@@ -109,11 +97,25 @@ boardEl.addEventListener('click', function(event) {
 
 // MAIN
 
-function init() {
+function init(colorValue) {
+    // changes button display to "in-game" mode
+    resetBtn.style.display = 'inline';
+    colorSelectors.style.display = 'none';
+
+    // initializes player variables according to color choice
+    turn = 1;
+    winner = 0;
+    player1Val = colorValue;
+    player2Val = -colorValue;
+    playerNames = {};
+    playerNames[player1Val.toString()] = 'player1';
+    playerNames[player2Val.toString()] = 'player2';
+
+    gameStatusEl.innerHTML = "<span id='turn-color'></span>'s turn to move";
+
     initilializeBoard();
     render();
 }
-
 
 function render() {
     renderBoard();
@@ -188,7 +190,6 @@ function renderBoard() {
             const tileValue = board[rowIndex][columnIndex];
             const tileId = `r${rowIndex}c${columnIndex}`; 
             const tileEl = document.getElementById(tileId); // access the id of the HTML element corresponding to the selected tile
-            console.log(tileEl, tileId);
             if (!tileValue && tileEl.hasChildNodes()) { // if there is no piece on that tile, continue
                 tileEl.removeChild();
                 continue;
@@ -200,7 +201,7 @@ function renderBoard() {
                 const newPiece = document.createElement('button');
                 newPiece.className = (tileValue === player1Val) ? `player1-piece ${colors[player1Val.toString()]}` : `player2-piece ${colors[player2Val.toString()]}`;
                 tileEl.appendChild(newPiece);
-            }
+            } 
         }
     }
 }
@@ -208,66 +209,104 @@ function renderBoard() {
 // RENDER OTHER
 
 function renderMessage() {
-
+    if (winner) {
+        if (winner = 1) {
+            gameStatusEl.style.backgroundColor = 'rgb(50, 30, 0)';
+        } else if (winner = -1) {
+            gameStatusEl.style.backgroundColor = 'darkgreen;'
+        }
+        gameStatusEl.style.color = 'ivory';
+        gameStatusEl.innerText = `${playerColors[winner].toString()} is the winner!`;
+    } else {
+        const turnColorEl = document.getElementById('turn-color');
+        if (turn === 1) {
+            turnColorEl.innerText = 'Brown'
+            turnColorEl.style.color = 'rgb(50, 30, 0)';
+            gameStatusEl.style.backgroundColor = 'saddlebrown'
+        } else if (turn === -1) {
+            turnColorEl.innerText = 'Green';
+            turnColorEl.style.color = 'darkgreen';
+            gameStatusEl.style.backgroundColor = 'mediumseagreen';
+        }
+    }
 }
 
 function renderControls() {
-
+    if (winner) {
+        resetBtn.style.display = 'none';
+        colorSelectors.style.display = 'inline';
+        controlsTextEl.innerText = 'Play again?';
+    }
 }
 
 // ---------------- GAME LOGIC ---------------------
 
-function move(target) {
-    
-    const r = parseInt(target.id[1]);
-    const c = parseInt(target.id[3]);
+// MOVE PIECE
+
+function movePiece(target) {
+
+    highlightedEl = document.querySelector('.highlighted');
+    const newR = parseInt(target.id[1]);
+    const newC = parseInt(target.id[3]);
     console.log(target);
 
     clearMoveMarkers();
 
-    board[r][c] = turn;
+    board[newR][newC] = turn;
     board[clickedPiece[0]][clickedPiece[1]] = 0;
-    highlightedEl = document.querySelector('.highlighted');
+
+    if (canCapture) {
+        for(captureMove of captureMoves) {
+            if (captureMove[0].toString() === clickedPiece.toString()) {
+                console.log(captureMove[1]);
+                const capturedTile = document.getElementById(`r${captureMove[1][0]}c${captureMove[1][1]}`)
+                const capturedPiece = capturedTile.firstChild;
+                console.log(capturedTile, capturedPiece);
+                capturedPiece.remove();
+                board[captureMove[1][0]][captureMove[1][1]] = 0;
+            }
+        }
+    }
+
     highlightedEl.remove();
 
-
+    isWinner();
     turn *= -1;
-
     render();
 }
 
-// CAN CAPTURE
+// GET ALL MOVES FOR THE TURN PLAYER
 
 function getAllMoves() {
-
     moves = [];
     captureMoves = [];
     canCapture = false;
     
     // determines which directions a player's pieces are moving
     if (turn === player1Val) {
-        turnVal = 1;
+        offset = 1;
     } else if (turn === player2Val) {
-        turnVal = -1;
+        offset = -1;
     }
 
     for (let rowIndex = 0; rowIndex < board.length; rowIndex++) {
         for (let columnIndex = 0; columnIndex < board[rowIndex].length; columnIndex++) {
             const currentValue = board[rowIndex][columnIndex];
-            if (currentValue === turnVal) {
-                
-                const nextRow = board[rowIndex + turnVal]; // the row in front of a player's pieces
+            if (currentValue === turn) {
+                console.log('here1');
+                const nextRow = board[rowIndex + offset]; // the row in front of a player's pieces
                 if (nextRow) { // diagonals are respective to the side of each player
-                    diagL = nextRow[columnIndex - turnVal]; // piece's left diagonal
-                    diagR = nextRow[columnIndex + turnVal]; // piece's right diagonal
-                    console.log(diagL, diagR, nextRow);
+                    diagL = nextRow[columnIndex - offset]; // piece's left diagonal
+                    diagR = nextRow[columnIndex + offset]; // piece's right diagonal
+                    //console.log(`row index ${rowIndex}, column index ${columnIndex}, diagL ${diagL}, diagR ${diagR}, nextRow ${nextRow}, moves ${moves}`);
 
                     // checks to see if the piece can capture any of the opponents' pieces
-                    checkCapture(rowIndex, columnIndex, diagL, diagR, turnVal);
+                    checkCapture(rowIndex, columnIndex, diagL, diagR, offset);
+                    console.log('can capture: ', canCapture);
 
                     // if no pieces so far can capture
                     if (!canCapture) {
-                        checkMoves(rowIndex, columnIndex, diagL, diagR, turnVal);
+                        checkMoves(rowIndex, columnIndex, diagL, diagR, offset);
                     }
                 }
             }
@@ -275,46 +314,49 @@ function getAllMoves() {
     }
 }
 
-function checkCapture(rowIndex, columnIndex, diagL, diagR, turnVal) {
+function checkCapture(rowIndex, columnIndex, diagL, diagR, offset) {
 
-    const superRow = board[rowIndex + (turnVal*2)];
+    const superRow = board[rowIndex + (offset*2)];
+    let superDiagL;
+    let superDiagR;
 
     if (superRow) {
         // a "superDiag"
-        superDiagL = superRow[columnIndex - (turnVal*2)];
-        superDiagR = superRow[columnIndex + (turnVal*2)];
+        superDiagL = superRow[columnIndex - (offset*2)];
+        superDiagR = superRow[columnIndex + (offset*2)];
     }
 
+    console.log(`row ${rowIndex}, column ${columnIndex}, diagL ${diagL}, diagR ${diagR}, superDiagL ${superDiagL}, superDiagR ${superDiagR}, turn ${turn}, offset ${offset}`);
+
     if (diagL !== undefined && superDiagL !== undefined) {
-        if (board.diagL === -turn && !board.superDiagL) {
-            captureMoves.push([[rowIndex, columnIndex], [rowIndex + (turnVal*2), columnIndex - (turnVal*2)]]);
+        if (diagL === -turn && !superDiagL) {
+            captureMoves.push([[rowIndex, columnIndex], [rowIndex + offset, columnIndex - offset], [rowIndex + (offset*2), columnIndex - (offset*2)]]);
             canCapture = true;
+            console.log(captureMoves);
         }
     }
 
-    if (diagR !== undefined && superDiagL !== undefined) {
-        if (board.diagR === -turn && !board.superDiagR) {
-            captureMoves.push([rowIndex, columnIndex], [rowIndex + (turnVal*2), columnIndex + (turnVal*2)]);
+    if (diagR !== undefined && superDiagR !== undefined) {
+        if (diagR === -turn && !superDiagR) {
+            captureMoves.push([[rowIndex, columnIndex], [rowIndex + offset, columnIndex + offset], [rowIndex + (offset*2), columnIndex + (offset*2)]]);
             canCapture = true;
+            console.log(captureMoves);
         }
     }
 }
 
-function checkMoves(rowIndex, columnIndex, diagL, diagR, turnVal) {
+function checkMoves(rowIndex, columnIndex, diagL, diagR, offset) {
 
     if (diagL !== undefined && !diagL) {
-        moves.push([[rowIndex, columnIndex], [rowIndex + turnVal, columnIndex - turnVal]]);
+        moves.push([[rowIndex, columnIndex], [rowIndex + offset, columnIndex - offset]]);
     }
 
     if (diagR !== undefined && !diagR) {
-        moves.push([[rowIndex, columnIndex], [rowIndex + turnVal, columnIndex + turnVal]]);
+        moves.push([[rowIndex, columnIndex], [rowIndex + offset, columnIndex + offset]]);
     }
 }
 
-
-
-
-// SHOW A PIECE'S MOVES
+// SHOW A PIECE'S MOVES IN THE DISPLAY
 
 function showMoves(event) { //r_c_
     clearMoveMarkers();
@@ -333,10 +375,12 @@ function showMoves(event) { //r_c_
     console.log(captureMoves);
 
     if (captureMoves.length > 0) {
+        console.log('captureMoves = ', captureMoves);
         captureMoves.forEach(function(captureMove) {
             const pieceThatCanCapture = captureMove[0];
-            if (pieceThatCanCapture === clickedPiece) {
-                createMoveMarker(row, column);
+            console.log('capture move = ', captureMove, 'clicked piece =', clickedPiece, ' piece that can capture = ', pieceThatCanCapture);
+            if (pieceThatCanCapture.toString() === clickedPiece.toString()) {
+                createMoveMarker(captureMove[2][0], captureMove[2][1]);
             }
         })
     } else {
@@ -352,13 +396,13 @@ function showMoves(event) { //r_c_
 
 }
 
-function createMoveMarker(row, column) {
+// MOVE MARKER SUB FUNCTIONS
 
+function createMoveMarker(row, column) {
     const moveMarkerEl = document.createElement('div');
     const moveTileEl = document.querySelector(`#r${row}c${column}`);
     moveMarkerEl.className = 'possible-move';
     moveTileEl.appendChild(moveMarkerEl);
-
 }
 
 function clearMoveMarkers() {
@@ -368,10 +412,26 @@ function clearMoveMarkers() {
     }
 }
 
-// MOVE
 
-function movePiece(highlightedPiece, gridId) {
-    
+// Checks for Winner
+
+function isWinner() {
+
+    let player1Piece = document.querySelector('.player1-piece');
+    let player2Piece = document.querySelector('.player2-piece');
+
+    console.log(player1Piece);
+    console.log(player2Piece);
+
+    if (player1Piece === null) {
+        winner = player2Val;
+    } else if (player2Piece === null) {
+        winner = player1Val;
+    } else if (moves.length === 0 && captureMoves.length === 0) {
+        winner = -turn;
+    }
 }
 
-// function 
+function countPieces() {
+
+}

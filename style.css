@@ -28,11 +28,28 @@ header {
     border-radius: 100%;
 }
 
+#game-status {
+    color: ivory;
+    width: 64vmin;
+    height: 10vmin;
+    font-size: 3.5vmin;
+    padding: 1vmin 5vmin 0 5vmin;
+    margin-bottom: 6vmin;
+    border: .5vmin;
+    border-style: solid;
+    border-color: goldenrod;
+    background-color: black;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
 p {
     height: 5vmin;
     margin-top: 1vmin;
     font-size: 2vmin;
     color: ivory;
+    text-align: center;
 }
 
 #rules {
@@ -64,7 +81,7 @@ p {
 }
 
 #board .light {
-    background-color: lightgray;
+    background-color: ivory;
 }
 
 #board .dark {
@@ -97,16 +114,16 @@ p {
     border: .1vmin;
     border-style: solid;
     border-color: black;
-    background-color: grey;
+    background-color: darkgray;
     border-radius: 50%;
 }
 
 .highlighted.dark-piece {
-    background-color: rgb(75, 50, 0);
+    background-color: rgb(90, 40, 0);
 }
 
 .highlighted.light-piece {
-    background-color: rgb(10, 50, 10);
+    background-color: rgb(25, 80, 25);
 }
 
 /* .colors {
@@ -121,6 +138,7 @@ p {
     border-color:goldenrod;
     border-radius: 20%;
     text-align: center;
+    font-size: 2vmin;
 }
 
 #play-light-button {
