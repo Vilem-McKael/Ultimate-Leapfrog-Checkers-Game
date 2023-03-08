@@ -1,3 +1,8 @@
+// TO DO
+// - fix kings for all sides
+// - add a bad computer player option
+
+
 /*----- Constants -----*/
 
 // piece colors for class work
@@ -223,13 +228,13 @@ function renderBoard() {
 
 function renderMessage() {
     if (winner) {
-        if (winner = 1) {
-            gameStatusEl.style.backgroundColor = 'rgb(50, 30, 0)';
-        } else if (winner = -1) {
-            gameStatusEl.style.backgroundColor = 'darkgreen;'
+        if (winner === 1) {
+            gameStatusEl.style.backgroundColor = 'rgb(60, 35, 0)';
+        } else if (winner === -1) {
+            gameStatusEl.style.backgroundColor = 'rgb(30, 30, 60)';
         }
         gameStatusEl.style.color = 'ivory';
-        gameStatusEl.innerText = `${playerColors[winner].toString()} is the winner!`;
+        gameStatusEl.innerText = `${playerColors[winner.toString()]} is the winner!`;
     } else {
         const turnColorEl = document.getElementById('turn-color');
         if (turn === 1) {
@@ -271,8 +276,17 @@ function movePiece(target) {
         isKing = 2;
     }
 
+    let offset;
+
+    if (turn === player1Val) {
+        offset = 1;
+    } else if (turn === player2Val) {
+        offset = -1;
+    }
+
     board[newR][newC] = turn * isKing;
     board[clickedPiece[0]][clickedPiece[1]] = 0;
+
 
     if (canCapture) {
         for(captureMove of captureMoves) {
@@ -281,6 +295,29 @@ function movePiece(target) {
                 const capturedPiece = capturedTile.firstChild;
                 capturedPiece.remove();
                 board[captureMove[1][0]][captureMove[1][1]] = 0;
+
+                // multi-capture logic
+                // captureMoves = [];
+                // clickedPiece = [newR, newC];
+
+                // let nextRow, diagL, diagR, backRow, bDiagL, bDiagR;
+
+                // nextRow = board[newR + offset];
+                // if (nextRow) {
+                //     diagL = nextRow[newC - offset];
+                //     diagR = nextRow[newC + offset];
+                // }
+
+                // backRow = board[newR - offset];
+                // if (backRow) {
+                //     bDiagL = backRow[newC - offset];
+                //     bDiagR = backRow[newC + offset];
+                // }
+
+                // checkCapture(newR, newC, diagL, diagR, offset, isKing === 2, bDiagL, bDiagR);
+                // if (captureMoves.length === 0) {
+                //     canCapture = false;
+                // }
             }
         }
     }
@@ -308,7 +345,8 @@ function getAllMoves() {
     for (let rowIndex = 0; rowIndex < board.length; rowIndex++) {
         for (let columnIndex = 0; columnIndex < board[rowIndex].length; columnIndex++) {
             const currentValue = board[rowIndex][columnIndex];
-            const isMyKing = (currentValue * offset === 2) ? true : false; 
+            const isMyKing = (currentValue * turn) === 2; 
+            console.log('isKingCheck', (currentValue * turn), isMyKing)
             if (currentValue === turn) {
                 const nextRow = board[rowIndex + offset]; // the row in front of a player's pieces
 
@@ -386,13 +424,13 @@ function checkCapture(rowIndex, columnIndex, diagL, diagR, offset, isKing, bDiag
             bSuperDiagR = bSuperRow[columnIndex + (offset*2)];
         }
 
-        if (bDiagL !== undefined && bSuperDiagL !== undefined && (bDiagL === -turn || bDiagL === -turn*2) && !superDiagL) {
+        if (bDiagL !== undefined && bSuperDiagL !== undefined && (bDiagL === -turn || bDiagL === -turn*2) && !bSuperDiagL) {
             captureMoves.push([[rowIndex, columnIndex], [rowIndex - offset, columnIndex - offset], [rowIndex - (offset*2), columnIndex - (offset*2)]]);
             canCapture = true;
             console.log(captureMoves);
         }
 
-        if (bDiagR !== undefined && bSuperDiagR !== undefined && (bDiagR === -turn || bDiagR === -turn*2) && !superDiagR) {
+        if (bDiagR !== undefined && bSuperDiagR !== undefined && (bDiagR === -turn || bDiagR === -turn*2) && !bSuperDiagR) {
             captureMoves.push([[rowIndex, columnIndex], [rowIndex - offset, columnIndex + offset], [rowIndex - (offset*2), columnIndex + (offset*2)]]);
             canCapture = true;
             console.log(captureMoves);
@@ -412,10 +450,12 @@ function checkMoves(rowIndex, columnIndex, diagL, diagR, offset, isKing, bDiagL,
     }
 
     if (isKing && bDiagL !== undefined && !bDiagL) {
+        console.log('row ', rowIndex, 'column', columnIndex, 'diagL', diagL, 'diagR', diagR, 'offset', offset, 'isKing', isKing, 'bDiagL', bDiagL, 'bDiagR', bDiagR);
         moves.push([[rowIndex, columnIndex], [rowIndex - offset, columnIndex - offset]]);
     }
 
     if (isKing && bDiagR !== undefined && !bDiagR) {
+        console.log('row ', rowIndex, 'column', columnIndex, 'diagL', diagL, 'diagR', diagR, 'offset', offset, 'isKing', isKing, 'bDiagL', bDiagL, 'bDiagR', bDiagR);
         moves.push([[rowIndex, columnIndex], [rowIndex - offset, columnIndex + offset]]);
     }
 }
@@ -481,14 +521,18 @@ function checkWinner() {
     const p1Key = player1Val.toString()
     const p2Key = player2Val.toString();
 
-    if (pieceCount[p1Key] === 0) {
+    if (!pieceCount[p1Key]) {
+        console.log('pieceCount', pieceCount, 'p1Key', p1Key)
         winner = player2Val;
         turn = 0;
-    } else if (pieceCount[p2Key] === 0) {
+    } else if (!pieceCount[p2Key]) {
+        console.log('pieceCount', pieceCount, 'p2Key', p2Key)
         winner = player1Val;
         turn = 0;
     } else if (moves.length === 0 && captureMoves.length === 0) {
-        winner = -turn;
+        console.log('turn', turn, 'winner', winner);
+        winner = turn * -1;
+        console.log('turn', turn, 'winner', winner);
         turn = 0;
     }
 }
