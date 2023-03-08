@@ -37,9 +37,9 @@ let clickedPiece;
 
 let pieceSelected; // bool, is there a highlighted piece
 
-let playerNames;
+let playerNames; // object, assigns the strings 'player1' and 'player2' to either 1 or -1 depending on what piece color they are playing
 
-let pieceCount;
+let pieceCount; // counts the values of every tile in the game state board;
 
 
 /*----- Cached Variables -----*/
@@ -47,9 +47,9 @@ let pieceCount;
 const boardEl = document.querySelector('#board'); // board element
 const playDarkBtn = document.querySelector('#play-dark-button'); // play as dark pieces button
 const playLightBtn = document.querySelector('#play-light-button'); // play as light pieces button
-const colorSelectors = document.querySelector('#color-select-buttons');
-const controlsTextEl = document.querySelector('#controls-text')
-const resetBtn = document.querySelector('#reset-button'); // reset the board button, only visible if game is in play
+const colorSelectors = document.querySelector('#color-select-buttons'); // holds the container for the controls-text and color-selectors
+const controlsTextEl = document.querySelector('#controls-text') // displays the text above the color-select buttons
+const resetBtn = document.querySelector('#reset-button'); // press to reset the board, only visible if game is in play
 const gameStatusEl = document.getElementById('game-status');
 const tiles = document.querySelectorAll('#board > div'); // all board "tiles" in a Node List
 
@@ -59,11 +59,13 @@ const tiles = document.querySelectorAll('#board > div'); // all board "tiles" in
 
 // Start game, playing as dark (plays first)
 playDarkBtn.addEventListener('click', function() {
+    clearBoard(); // ****** 
     init(1);
 })
 
 // Start game, playing as light (plays second)
 playLightBtn.addEventListener('click', function() {
+    clearBoard(); // ****find a way to do this after a win without putting this in both the reset and selector buttons
     init(-1);
 })
 
@@ -88,7 +90,6 @@ boardEl.addEventListener('click', function(event) {
         return;
     } else if (event.target.hasChildNodes()) {
         const childNodes = event.target.childNodes ;
-        console.log(childNodes);
         if (childNodes[0].classList.contains('possible-move')) {
             movePiece(event.target);
         }
@@ -177,7 +178,6 @@ function clearBoard() {
 
     // clear pieces from display
     for (let i = 0; i < tiles.length; i++) {
-        // console.log(tiles[i]);
         if (tiles[i].hasChildNodes()) {
             tiles[i].removeChild(tiles[i].childNodes[0]);
         }
@@ -207,7 +207,12 @@ function renderBoard() {
                 continue; // continue to the next tile
             } else {
                 const newPiece = document.createElement('button');
-                newPiece.className = (tileValue === player1Val) ? `player1-piece ${colors[player1Val.toString()]}` : `player2-piece ${colors[player2Val.toString()]}`;
+                if (Math.abs(tileValue) === 1) { // create a normal player piece
+                    newPiece.className = (tileValue === player1Val) ? `player1-piece ${colors[player1Val.toString()]}` : `player2-piece ${colors[player2Val.toString()]}`;
+                } else if (Math.abs(tileValue) === 2) { // create a king player piece
+                    newPiece.className = (tileValue === player1Val * 2) ? `player1-piece king ${colors[player1Val.toString()]}` : `player2-piece king ${colors[player2Val.toString()]}`;
+                }
+                
                 tileEl.appendChild(newPiece);
             } 
         }
@@ -256,20 +261,24 @@ function movePiece(target) {
     highlightedEl = document.querySelector('.highlighted');
     const newR = parseInt(target.id[1]);
     const newC = parseInt(target.id[3]);
-    console.log(target);
 
     clearMoveMarkers();
 
-    board[newR][newC] = turn;
+    let isKing = 1;
+
+    // if the piece just became a king, or if the piece was already a king
+    if ((turn === player1Val && newR === 7 || turn === player2Val && newR === 0) || highlightedEl.classList.contains('king')) {
+        isKing = 2;
+    }
+
+    board[newR][newC] = turn * isKing;
     board[clickedPiece[0]][clickedPiece[1]] = 0;
 
     if (canCapture) {
         for(captureMove of captureMoves) {
             if (captureMove[0].toString() === clickedPiece.toString()) {
-                console.log(captureMove[1]);
                 const capturedTile = document.getElementById(`r${captureMove[1][0]}c${captureMove[1][1]}`)
                 const capturedPiece = capturedTile.firstChild;
-                console.log(capturedTile, capturedPiece);
                 capturedPiece.remove();
                 board[captureMove[1][0]][captureMove[1][1]] = 0;
             }
@@ -299,60 +308,100 @@ function getAllMoves() {
     for (let rowIndex = 0; rowIndex < board.length; rowIndex++) {
         for (let columnIndex = 0; columnIndex < board[rowIndex].length; columnIndex++) {
             const currentValue = board[rowIndex][columnIndex];
+            const isMyKing = (currentValue * offset === 2) ? true : false; 
             if (currentValue === turn) {
-                console.log('here1');
                 const nextRow = board[rowIndex + offset]; // the row in front of a player's pieces
+
                 if (nextRow) { // diagonals are respective to the side of each player
-                    diagL = nextRow[columnIndex - offset]; // piece's left diagonal
-                    diagR = nextRow[columnIndex + offset]; // piece's right diagonal
-                    //console.log(`row index ${rowIndex}, column index ${columnIndex}, diagL ${diagL}, diagR ${diagR}, nextRow ${nextRow}, moves ${moves}`);
+                    const diagL = nextRow[columnIndex - offset]; // piece's left diagonal
+                    const diagR = nextRow[columnIndex + offset]; // piece's right diagonal                                  
 
                     // checks to see if the piece can capture any of the opponents' pieces
-                    checkCapture(rowIndex, columnIndex, diagL, diagR, offset);
-                    console.log('can capture: ', canCapture);
+                    checkCapture(rowIndex, columnIndex, diagL, diagR, offset, false, undefined, undefined);
 
                     // if no pieces so far can capture
                     if (!canCapture) {
-                        checkMoves(rowIndex, columnIndex, diagL, diagR, offset);
+                        checkMoves(rowIndex, columnIndex, diagL, diagR, offset, false, undefined, undefined);
                     }
+                }
+            } else if (isMyKing) {
+                
+                let diagL, diagR, bDiagL, bDiagR;
+
+                const nextRow = board[rowIndex + offset];
+                if (nextRow) {
+                    diagL = nextRow[columnIndex - offset];
+                    diagR = nextRow[columnIndex + offset];
+                }
+
+                const backRow = board[rowIndex - offset];
+                if (backRow) {
+                    bDiagL = backRow[columnIndex - offset];
+                    bDiagR = backRow[columnIndex + offset];
+                }
+
+                checkCapture(rowIndex, columnIndex, diagL, diagR, offset, true, bDiagL, bDiagR);
+                if (!canCapture) {
+                    checkMoves(rowIndex, columnIndex, diagL, diagR, offset, true, bDiagL, bDiagR);
                 }
             }
         }
     }
 }
 
-function checkCapture(rowIndex, columnIndex, diagL, diagR, offset) {
+function checkCapture(rowIndex, columnIndex, diagL, diagR, offset, isKing, bDiagL, bDiagR) {
 
+    // a "super row" is a row two rows in front of a given piece
     const superRow = board[rowIndex + (offset*2)];
-    let superDiagL;
-    let superDiagR;
+    let superDiagL, superDiagR;
 
     if (superRow) {
-        // a "superDiag"
+        // a "super diagonal" is two tiles diagonally in either direction
         superDiagL = superRow[columnIndex - (offset*2)];
         superDiagR = superRow[columnIndex + (offset*2)];
     }
 
-    console.log(`row ${rowIndex}, column ${columnIndex}, diagL ${diagL}, diagR ${diagR}, superDiagL ${superDiagL}, superDiagR ${superDiagR}, turn ${turn}, offset ${offset}`);
+    //console.log(`row ${rowIndex}, column ${columnIndex}, diagL ${diagL}, diagR ${diagR}, superDiagL ${superDiagL}, superDiagR ${superDiagR}, turn ${turn}, offset ${offset}`);
 
-    if (diagL !== undefined && superDiagL !== undefined) {
-        if (diagL === -turn && !superDiagL) {
-            captureMoves.push([[rowIndex, columnIndex], [rowIndex + offset, columnIndex - offset], [rowIndex + (offset*2), columnIndex - (offset*2)]]);
-            canCapture = true;
-            console.log(captureMoves);
-        }
+    if (diagL !== undefined && superDiagL !== undefined && (diagL === -turn || diagL === -turn*2) && !superDiagL) {
+        captureMoves.push([[rowIndex, columnIndex], [rowIndex + offset, columnIndex - offset], [rowIndex + (offset*2), columnIndex - (offset*2)]]);
+        canCapture = true;
+        console.log(captureMoves);
     }
 
-    if (diagR !== undefined && superDiagR !== undefined) {
-        if (diagR === -turn && !superDiagR) {
-            captureMoves.push([[rowIndex, columnIndex], [rowIndex + offset, columnIndex + offset], [rowIndex + (offset*2), columnIndex + (offset*2)]]);
+    if (diagR !== undefined && superDiagR !== undefined && (diagR === -turn || diagR === -turn*2) && !superDiagR) {
+        captureMoves.push([[rowIndex, columnIndex], [rowIndex + offset, columnIndex + offset], [rowIndex + (offset*2), columnIndex + (offset*2)]]);
+        canCapture = true;
+        console.log(captureMoves);
+    }
+
+    if (isKing) {
+
+        // b super row stands for back super row
+        const bSuperRow = board[rowIndex - (offset*2)];
+        let bSuperDiagL, bSuperDiagR;
+
+        if (bSuperRow) {
+            bSuperDiagL = bSuperRow[columnIndex - (offset*2)];
+            bSuperDiagR = bSuperRow[columnIndex + (offset*2)];
+        }
+
+        if (bDiagL !== undefined && bSuperDiagL !== undefined && (bDiagL === -turn || bDiagL === -turn*2) && !superDiagL) {
+            captureMoves.push([[rowIndex, columnIndex], [rowIndex - offset, columnIndex - offset], [rowIndex - (offset*2), columnIndex - (offset*2)]]);
             canCapture = true;
             console.log(captureMoves);
         }
+
+        if (bDiagR !== undefined && bSuperDiagR !== undefined && (bDiagR === -turn || bDiagR === -turn*2) && !superDiagR) {
+            captureMoves.push([[rowIndex, columnIndex], [rowIndex - offset, columnIndex + offset], [rowIndex - (offset*2), columnIndex + (offset*2)]]);
+            canCapture = true;
+            console.log(captureMoves);
+        }
+
     }
 }
 
-function checkMoves(rowIndex, columnIndex, diagL, diagR, offset) {
+function checkMoves(rowIndex, columnIndex, diagL, diagR, offset, isKing, bDiagL, bDiagR) {
 
     if (diagL !== undefined && !diagL) {
         moves.push([[rowIndex, columnIndex], [rowIndex + offset, columnIndex - offset]]);
@@ -361,7 +410,16 @@ function checkMoves(rowIndex, columnIndex, diagL, diagR, offset) {
     if (diagR !== undefined && !diagR) {
         moves.push([[rowIndex, columnIndex], [rowIndex + offset, columnIndex + offset]]);
     }
+
+    if (isKing && bDiagL !== undefined && !bDiagL) {
+        moves.push([[rowIndex, columnIndex], [rowIndex - offset, columnIndex - offset]]);
+    }
+
+    if (isKing && bDiagR !== undefined && !bDiagR) {
+        moves.push([[rowIndex, columnIndex], [rowIndex - offset, columnIndex + offset]]);
+    }
 }
+
 
 // SHOW A PIECE'S MOVES IN THE DISPLAY
 
@@ -377,9 +435,6 @@ function showMoves(event) { //r_c_
     const r = parseInt(gridId[1]); // r_
     const c = parseInt(gridId[3]); // c_
     clickedPiece = [r, c];
-
-    //console.log(moves);
-    console.log(captureMoves);
 
     if (captureMoves.length > 0) {
         console.log('captureMoves = ', captureMoves);
@@ -419,25 +474,7 @@ function clearMoveMarkers() {
     }
 }
 
-
-// Checks for Winner
-
-// function isWinner() {
-
-//     let player1Piece = document.querySelector('.player1-piece');
-//     let player2Piece = document.querySelector('.player2-piece');
-
-//     console.log(player1Piece);
-//     console.log(player2Piece);
-
-//     if (player1Piece === null) {
-//         winner = player2Val;
-//     } else if (player2Piece === null) {
-//         winner = player1Val;
-//     } else if (moves.length === 0 && captureMoves.length === 0) {
-//         winner = -turn;
-//     }
-// }
+// check the state board to see if a player has won
 
 function checkWinner() {
 

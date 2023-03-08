@@ -134,6 +134,14 @@ p {
     background-color: rgb(25, 80, 25);
 }
 
+.king.dark-piece {
+    background-color: darkred;
+}
+
+.king.light-piece {
+    background-color: lightskyblue;
+}
+
 /* .colors {
 
 } */
