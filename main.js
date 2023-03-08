@@ -39,6 +39,8 @@ let pieceSelected; // bool, is there a highlighted piece
 
 let playerNames;
 
+let pieceCount;
+
 
 /*----- Cached Variables -----*/
 
@@ -119,9 +121,10 @@ function init(colorValue) {
 
 function render() {
     renderBoard();
+    getAllMoves();
+    checkWinner();
     renderMessage();
     renderControls();
-    getAllMoves();
 }
 
 // BOARD
@@ -183,11 +186,16 @@ function clearBoard() {
 
 
 function renderBoard() {
+    
+    pieceCount = {}; // stores the total number of pieces and empty spaces on the board
+
     // Iterate over each row in the 2D board array
     for (let rowIndex = 0; rowIndex < board.length; rowIndex++) {
         // Iterate over each tile (row * column) in the 2D board array
         for (let columnIndex = 0; columnIndex < board[rowIndex].length; columnIndex++) {
             const tileValue = board[rowIndex][columnIndex];
+            const tileValueKey = tileValue.toString();
+            pieceCount[tileValueKey] ? pieceCount[tileValueKey]++ : pieceCount[tileValueKey] = 1; // adds 1 to the pieceCount object for every tile ???
             const tileId = `r${rowIndex}c${columnIndex}`; 
             const tileEl = document.getElementById(tileId); // access the id of the HTML element corresponding to the selected tile
             if (!tileValue && tileEl.hasChildNodes()) { // if there is no piece on that tile, continue
@@ -270,7 +278,6 @@ function movePiece(target) {
 
     highlightedEl.remove();
 
-    isWinner();
     turn *= -1;
     render();
 }
@@ -415,23 +422,36 @@ function clearMoveMarkers() {
 
 // Checks for Winner
 
-function isWinner() {
+// function isWinner() {
 
-    let player1Piece = document.querySelector('.player1-piece');
-    let player2Piece = document.querySelector('.player2-piece');
+//     let player1Piece = document.querySelector('.player1-piece');
+//     let player2Piece = document.querySelector('.player2-piece');
 
-    console.log(player1Piece);
-    console.log(player2Piece);
+//     console.log(player1Piece);
+//     console.log(player2Piece);
 
-    if (player1Piece === null) {
+//     if (player1Piece === null) {
+//         winner = player2Val;
+//     } else if (player2Piece === null) {
+//         winner = player1Val;
+//     } else if (moves.length === 0 && captureMoves.length === 0) {
+//         winner = -turn;
+//     }
+// }
+
+function checkWinner() {
+
+    const p1Key = player1Val.toString()
+    const p2Key = player2Val.toString();
+
+    if (pieceCount[p1Key] === 0) {
         winner = player2Val;
-    } else if (player2Piece === null) {
+        turn = 0;
+    } else if (pieceCount[p2Key] === 0) {
         winner = player1Val;
+        turn = 0;
     } else if (moves.length === 0 && captureMoves.length === 0) {
         winner = -turn;
+        turn = 0;
     }
-}
-
-function countPieces() {
-
 }

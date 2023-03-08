@@ -96,6 +96,7 @@ p {
     border-color: goldenrod;
     border-radius: 50%;
     background-color: mediumseagreen;
+    transform: scale(0.9);
 }
 
 .dark-piece {
@@ -106,16 +107,23 @@ p {
     border-color: goldenrod;
     border-radius: 50%;
     background-color: saddlebrown;
+    transform: scale(0.9);
 }
 
 .possible-move {
-    width: 3vmin;
-    height: 3vmin;
+    width: 3.5vmin;
+    height: 3.5vmin;
     border: .1vmin;
     border-style: solid;
     border-color: black;
-    background-color: darkgray;
+    background-color: rgb(125, 125, 125);
     border-radius: 50%;
+    transform:scale(0.8);
+}
+
+.possible-move:hover {
+    transform: scale(0.95);
+    transition: transform 80ms ease-in;
 }
 
 .highlighted.dark-piece {
@@ -139,6 +147,7 @@ p {
     border-radius: 20%;
     text-align: center;
     font-size: 2vmin;
+    font-family: fantasy;
 }
 
 #play-light-button {
@@ -157,4 +166,9 @@ p {
     background: black;
     color: white;
     display: none;
+}
+
+#board button:hover {
+    transform: scale(1);
+    transition: transform 100ms ease-in;
 }
