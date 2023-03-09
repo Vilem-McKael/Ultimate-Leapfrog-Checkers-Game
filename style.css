@@ -4,13 +4,11 @@
 
 body {
     height: 100vh;
-    /* width: 100vh; */
     margin: 0;
     display: flex;
     flex-direction: column;
-    /* justify-content: center; */
     align-items: center;
-    font-family: fantasy;
+    font-family: 'Macondo', cursive;
     background-color: rgb(25, 70, 25);
 }
 
@@ -22,7 +20,7 @@ header {
     width: 95vmin;
     text-align: center;
     letter-spacing: 1vmin;
-    border: .5vmin;
+    border: 0.5vmin;
     border-style: solid;
     border-color: goldenrod;
     border-radius: 100%;
@@ -35,7 +33,7 @@ header {
     font-size: 3.5vmin;
     padding: 1vmin 5vmin 0 5vmin;
     margin-bottom: 6vmin;
-    border: .5vmin;
+    border: 0.5vmin;
     border-style: solid;
     border-color: goldenrod;
     background-color: black;
@@ -50,11 +48,6 @@ p {
     font-size: 2vmin;
     color: ivory;
     text-align: center;
-}
-
-#rules {
-    /* margin: 0 auto 0 0; */
-    margin: 0 auto;
 }
 
 #controls {
@@ -91,7 +84,7 @@ p {
 .light-piece {
     width: 6vmin;
     height: 6vmin;
-    border: .5vmin;
+    border: 0.5vmin;
     border-style: solid;
     border-color: goldenrod;
     border-radius: 50%;
@@ -102,7 +95,7 @@ p {
 .dark-piece {
     width: 6vmin;
     height: 6vmin;
-    border: .5vmin;
+    border: 0.5vmin;
     border-style: solid;
     border-color: goldenrod;
     border-radius: 50%;
@@ -113,7 +106,7 @@ p {
 .possible-move {
     width: 3.5vmin;
     height: 3.5vmin;
-    border: .1vmin;
+    border: 0.1vmin;
     border-style: solid;
     border-color: black;
     background-color: rgb(125, 125, 125);
@@ -142,10 +135,6 @@ p {
     background-color: lightskyblue;
 }
 
-/* .colors {
-
-} */
-
 #play-light-button, #play-dark-button, #reset-button {
     width: 15vmin;
     height: 5vmin;
@@ -155,17 +144,19 @@ p {
     border-radius: 20%;
     text-align: center;
     font-size: 2vmin;
-    font-family: fantasy;
+    font-family: 'Macondo', cursive;
 }
 
 #play-light-button {
     background: mediumseagreen;
     color: white;
+    margin-top: -3vmin;
 }
 
 #play-dark-button {
     background: saddlebrown;
     color: white;
+    margin-top: -3vmin;
 }
 
 #reset-button {

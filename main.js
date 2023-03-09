@@ -77,7 +77,7 @@ playLightBtn.addEventListener('click', function() {
 // Reset the game, clear the board, allow the player to pick a color again
 resetBtn.addEventListener('click', function() {
     clearBoard();
-    gameStatusEl.innerText = 'Welcome to Ultimate Hopscotch!';
+    gameStatusEl.innerText = 'Welcome to Ultimate Leapfrog!';
     gameStatusEl.style.backgroundColor = 'black';
     colorSelectors.style.display = 'block';
     resetBtn.style.display = 'none';
@@ -231,7 +231,7 @@ function renderMessage() {
         if (winner === 1) {
             gameStatusEl.style.backgroundColor = 'rgb(60, 35, 0)';
         } else if (winner === -1) {
-            gameStatusEl.style.backgroundColor = 'rgb(30, 30, 60)';
+            gameStatusEl.style.backgroundColor = 'rgb(30, 60, 30)';
         }
         gameStatusEl.style.color = 'ivory';
         gameStatusEl.innerText = `${playerColors[winner.toString()]} is the winner!`;
@@ -521,19 +521,19 @@ function checkWinner() {
 
     const p1Key = player1Val.toString()
     const p2Key = player2Val.toString();
+    const p1KingKey = (player1Val * 2).toString();
+    const p2KingKey = (player2Val * 2).toString();
 
-    if (!pieceCount[p1Key]) {
+    if (!pieceCount[p1Key] && !pieceCount[p1KingKey]) {
         console.log('pieceCount', pieceCount, 'p1Key', p1Key)
         winner = player2Val;
         turn = 0;
-    } else if (!pieceCount[p2Key]) {
+    } else if (!pieceCount[p2Key] && !pieceCount[p2KingKey]) {
         console.log('pieceCount', pieceCount, 'p2Key', p2Key)
         winner = player1Val;
         turn = 0;
     } else if (moves.length === 0 && captureMoves.length === 0) {
-        console.log('turn', turn, 'winner', winner);
         winner = turn * -1;
-        console.log('turn', turn, 'winner', winner);
         turn = 0;
     }
 }
