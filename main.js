@@ -295,6 +295,7 @@ function movePiece(target) {
                 const capturedPiece = capturedTile.firstChild;
                 capturedPiece.remove();
                 board[captureMove[1][0]][captureMove[1][1]] = 0;
+                break;
 
                 // multi-capture logic
                 // captureMoves = [];
