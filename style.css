@@ -9,15 +9,18 @@ body {
     flex-direction: column;
     align-items: center;
     font-family: 'Macondo', cursive;
-    background-color: rgb(25, 70, 25);
+    background: url(https://i.imgur.com/CU8VCoB.jpg);
+    /* background: url('https://images5.alphacoders.com/352/352471.jpg'); */
+    background-size: cover;
+    background-position: center;
 }
 
 header {
     font-size: 3vmin;
-    color: darkgreen;
-    background-color: mediumseagreen;
+    color: ivory;
+    background-color: darkgreen;
     margin-top: 2vmin;
-    width: 95vmin;
+    width: 80vmin;
     text-align: center;
     letter-spacing: 1vmin;
     border: 0.5vmin;
@@ -48,6 +51,11 @@ p {
     font-size: 2vmin;
     color: ivory;
     text-align: center;
+    border: 0.5vmin;
+    border-style: solid;
+    border-color: goldenrod;
+    background-color: black;
+    padding-top: 1vmin;
 }
 
 #controls {
